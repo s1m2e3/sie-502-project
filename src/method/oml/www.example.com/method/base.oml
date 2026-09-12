@@ -1,0 +1,25 @@
+@dc:title "Base Vocabulary"
+@dc:description "The root vocabulary: the common traits every other term in this method builds on."
+vocabulary <http://www.example.com/method/base#> as base {
+    extends <http://purl.org/dc/elements/1.1/> as dc
+    extends <http://www.w3.org/2001/XMLSchema#> as xsd
+
+    @dc:description "A general model element; the root of this method's type hierarchy."
+    aspect Element
+
+    @dc:description "An element that can carry a textual expression (requirements, conditions, operands)."
+    aspect Expressible
+
+    @dc:description "A textual description attached to an Element. Asserted on instances, and queryable."
+    scalar property ^description [
+        domain Element
+        range xsd:string
+    ]
+
+    @dc:description "A textual expression attached to an Expressible element."
+    scalar property expression [
+        domain Expressible
+        range xsd:string
+        functional
+    ]
+}

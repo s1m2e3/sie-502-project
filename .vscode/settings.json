@@ -1,0 +1,5 @@
+{
+  "workbench.editorAssociations": {
+    "*.md": "oml.markdown.preview.editor"
+  }
+}

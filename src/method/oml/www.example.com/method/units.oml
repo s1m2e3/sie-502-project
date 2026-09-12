@@ -1,0 +1,112 @@
+@dc:title "Units Vocabulary"
+@dc:description "Quantity kinds and units this project needs that the ISQ/SI vocabularies do not define."
+vocabulary <http://www.example.com/method/units#> as units {
+    extends <http://purl.org/dc/elements/1.1/> as dc
+
+    //
+    // Power: sunlight captured, heat delivered to the pipe and to the gas
+    //
+
+    @dc:description "The physical quantity of power (dimension M L2 T-3)."
+    quantity Power [
+        dimension "M1 L2 T-3"
+    ]
+
+    @dc:description "The watt, the SI unit of power."
+    unit W [
+        measures Power
+        symbol "W"
+        multiplier 1.0
+    ]
+
+    @dc:description "The kilowatt (1000 W)."
+    unit kW [
+        measures Power
+        symbol "kW"
+        multiplier 1000.0
+    ]
+
+    //
+    // Area: Fresnel lens aperture, collector surfaces
+    //
+
+    @dc:description "The physical quantity of area (dimension L2)."
+    quantity Area [
+        dimension "L2"
+    ]
+
+    @dc:description "The square metre, the SI unit of area."
+    unit m2 [
+        measures Area
+        symbol "m2"
+        multiplier 1.0
+    ]
+
+    @dc:description "The square centimetre (0.0001 m2)."
+    unit cm2 [
+        measures Area
+        symbol "cm2"
+        multiplier 0.0001
+    ]
+
+    @dc:description "The square millimetre (0.000001 m2)."
+    unit mm2 [
+        measures Area
+        symbol "mm2"
+        multiplier 0.000001
+    ]
+
+    //
+    // Irradiance: solar power per collector area
+    //
+
+    @dc:description "The physical quantity of irradiance, power per unit area (dimension M T-3)."
+    quantity Irradiance [
+        dimension "M1 T-3"
+    ]
+
+    @dc:description "The watt per square metre, the SI unit of irradiance."
+    unit W_per_m2 [
+        measures Irradiance
+        symbol "W/m2"
+        multiplier 1.0
+    ]
+
+    @dc:description "The kilowatt per square metre (1000 W/m2)."
+    unit kW_per_m2 [
+        measures Irradiance
+        symbol "kW/m2"
+        multiplier 1000.0
+    ]
+
+    //
+    // Mass flow rate: nitrogen in and out (conserved across the pipe)
+    //
+
+    @dc:description "The physical quantity of mass flow rate (dimension M T-1)."
+    quantity MassFlowRate [
+        dimension "M1 T-1"
+    ]
+
+    @dc:description "The kilogram per second, the SI unit of mass flow rate."
+    unit kg_per_s [
+        measures MassFlowRate
+        symbol "kg/s"
+        multiplier 1.0
+    ]
+
+    @dc:description "The gram per second (0.001 kg/s)."
+    unit g_per_s [
+        measures MassFlowRate
+        symbol "g/s"
+        multiplier 0.001
+    ]
+
+    @dc:description "The kilogram per hour (1/3600 kg/s)."
+    unit kg_per_h [
+        measures MassFlowRate
+        symbol "kg/h"
+        multiplier 0.000277777777778
+    ]
+
+}

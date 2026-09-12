@@ -1,0 +1,287 @@
+@dc:title "Project Description"
+@dc:description "The model: instances of this project's system. Part B."
+description <http://www.example.com/project/description#> as myproject-desc {
+    uses <http://purl.org/dc/elements/1.1/> as dc
+    uses <http://www.example.com/method/base#> as base
+    uses <http://www.example.com/method/expression#> as expression
+    uses <http://www.example.com/method/requirement#> as requirement
+    uses <http://www.example.com/method/units#> as units
+    uses <http://opencaesar.io/si/> as si
+
+    //
+    // Inputs: what the environment and the stakeholders impose on the solar oven
+    //
+
+    instance SolarIrradiance : expression:Input [
+        base:description "Direct solar irradiance at the installation site"
+        expression:hasExchangeKind "Energy"
+        expression:irradianceLevel 800.0^^units:W_per_m2
+    ]
+
+    instance OperationMode : expression:Input [
+        base:description "The system is running and heating nitrogen for the pyrolysis reactor"
+        expression:hasExchangeKind "Abstraction"
+    ]
+
+    instance MaintenanceMode : expression:Input [
+        base:description "The system is stopped and handled by maintenance personnel"
+        expression:hasExchangeKind "Abstraction"
+    ]
+
+    //
+    // Entities: the things observations are taken on (no architecture implied)
+    //
+
+    instance NitrogenStream : expression:PhysicalEntity [
+        base:description "The nitrogen flowing from the generator, through the pipe, to the pyrolysis reactor"
+        expression:exhibits OutletNitrogenTemperature
+        expression:exhibits OutletNitrogenMassFlow
+        expression:exhibits OutletGasComposition
+    ]
+
+    instance Pipe : expression:PhysicalEntity [
+        base:description "The pipe that carries the nitrogen through the solar oven; its material is not yet chosen"
+        expression:hasPart InsulatedPipeSection
+        expression:hasPart BarePipeSection
+    ]
+
+    instance InsulatedPipeSection : expression:PhysicalEntity [
+        base:description "The insulated run of the pipe, outside the solar oven"
+        expression:exhibits InsulatedPipeSurfaceTemperature
+    ]
+
+    instance BarePipeSection : expression:PhysicalEntity [
+        base:description "The uninsulated run of the pipe, inside the solar oven where it takes the concentrated sunlight"
+        expression:exhibits BarePipeSurfaceTemperature
+    ]
+
+    instance InstallationSite : expression:PhysicalEntity [
+        base:description "The region of the world the system is installed in; it receives the sunlight the lens later concentrates"
+        expression:exhibits SolarIrradiance
+    ]
+
+    instance FresnelLens : expression:PhysicalEntity [
+        base:description "The Fresnel lens that concentrates site sunlight onto the bare pipe section"
+        expression:apertureArea 1.5^^units:m2
+        expression:exhibits CapturedSolarPower
+    ]
+
+    instance SystemState : expression:AbstractEntity [
+        base:description "The state the system is held in by its operators; it has no physical extent"
+        expression:exhibits OperationMode
+        expression:exhibits MaintenanceMode
+    ]
+
+    //
+    // Outputs: what the system delivers and what can be measured on it
+    //
+
+    instance CapturedSolarPower : expression:Output [
+        base:description "Solar power the lens concentrates onto the pipe, in W"
+        expression:hasExchangeKind "Energy"
+    ]
+
+    instance OutletNitrogenTemperature : expression:Output [
+        base:description "Temperature of the nitrogen delivered to the pyrolysis reactor, in K"
+        expression:hasExchangeKind "Energy"
+    ]
+
+    instance OutletNitrogenMassFlow : expression:Output [
+        base:description "Mass flow of nitrogen delivered to the pyrolysis reactor, in kg/h"
+        expression:hasExchangeKind "Matter"
+    ]
+
+    instance OutletGasComposition : expression:Output [
+        base:description "Composition of the gas leaving the pipe; must stay inert for pyrolysis"
+        expression:hasExchangeKind "Matter"
+    ]
+
+    instance InsulatedPipeSurfaceTemperature : expression:Output [
+        base:description "Surface temperature of the insulated pipe section, in K"
+        expression:hasExchangeKind "Energy"
+    ]
+
+    instance BarePipeSurfaceTemperature : expression:Output [
+        base:description "Surface temperature of the bare pipe section, in K"
+        expression:hasExchangeKind "Energy"
+    ]
+
+    instance AccessibleSurfaceTemperatures : expression:Output [
+        base:description "The set of surface temperatures a maintainer can reach during maintenance"
+        expression:hasExchangeKind "Energy"
+        expression:hasMember InsulatedPipeSurfaceTemperature
+        expression:hasMember BarePipeSurfaceTemperature
+    ]
+
+    //
+    // Stakeholders: each one raises at least one requirement
+    //
+
+    instance ReactorManagers : requirement:Stakeholder [
+        base:description "Pyrolysis reactor subsystem managers"
+        requirement:raises R1
+        requirement:raises R3
+    ]
+
+    instance PlantManagers : requirement:Stakeholder [
+        base:description "Plant managers and owners"
+        requirement:raises R5
+    ]
+
+    instance MaintenanceOperators : requirement:Stakeholder [
+        base:description "Maintenance operators of the system"
+        requirement:raises R4
+    ]
+
+    instance SafetyRegulators : requirement:Stakeholder [
+        base:description "Industrial safety and compliance regulators"
+        requirement:raises R2
+        requirement:raises R4
+    ]
+
+    //
+    // Requirements
+    //
+
+    instance R1 : requirement:Requirement [
+        base:description "Delivery of hot nitrogen"
+        base:expression "During operation, at the design solar irradiance of 800 W/m2 or more, the system shall deliver nitrogen to the pyrolysis reactor at 673.15 K or more and at 1.8 kg/h or more."
+        requirement:hasCondition C_R1
+        requirement:isVerifiedBy TS_ThermalSimulation
+    ]
+
+    instance R2 : requirement:Requirement [
+        base:description "Thermal safety of the heated pipe"
+        base:expression "During operation the outlet nitrogen shall stay at or below 873.15 K and the bare pipe surface at or below 923.15 K."
+        requirement:hasCondition C_R2
+        requirement:isVerifiedBy TS_ThermalSimulation
+    ]
+
+    instance R3 : requirement:Requirement [
+        base:description "Inert gas delivered"
+        base:expression "During operation the system shall deliver gas whose composition is nitrogen, so that no oxygen reaches the pyrolysis reactor."
+        requirement:hasCondition C_R3
+        requirement:isVerifiedBy TS_DesignInspection
+    ]
+
+    instance R4 : requirement:Requirement [
+        base:description "Touch safety during maintenance"
+        base:expression "During maintenance every accessible surface of the system shall stay at or below 323.15 K."
+        requirement:hasCondition C_R4
+        requirement:isVerifiedBy TS_MaintenanceDemonstration
+    ]
+
+    instance R5 : requirement:Requirement [
+        base:description "Solar capture capacity"
+        base:expression "During operation, at the design solar irradiance of 800 W/m2 or more, the lens shall concentrate at least 2.0 kW onto the pipe."
+        requirement:hasCondition C_R5
+        requirement:isVerifiedBy TS_ThermalSimulation
+    ]
+
+    //
+    // Conditions: the logic behind each requirement
+    //
+
+    // R1: AND of two leaves
+    instance C_R1 : expression:CompoundCondition [
+        base:description "During operation, at the design solar irradiance of 800 W/m2 or more: both the outlet temperature and the outlet flow conditions hold (AND)"
+        expression:connective "AND"
+        expression:hasOperand C_R1_Temperature
+        expression:hasOperand C_R1_Flow
+    ]
+
+    instance C_R1_Temperature : expression:TemperatureComparison [
+        base:description "During operation, at the design solar irradiance of 800 W/m2 or more, the outlet nitrogen temperature is at least 673.15 K (400 C)"
+        expression:constrains OutletNitrogenTemperature
+        expression:hasInput OperationMode
+        expression:hasInput SolarIrradiance
+        expression:comparisonOperator "GE"
+        expression:temperatureThreshold 673.15^^si:K
+    ]
+
+    instance C_R1_Flow : expression:MassFlowComparison [
+        base:description "During operation, the outlet nitrogen mass flow is at least 1.8 kg/h"
+        expression:constrains OutletNitrogenMassFlow
+        expression:hasInput OperationMode
+        expression:comparisonOperator "GE"
+        expression:massFlowThreshold 1.8^^units:kg_per_h
+    ]
+
+    // R2: AND of two leaves
+    instance C_R2 : expression:CompoundCondition [
+        base:description "During operation: neither the delivered gas nor the pipe exceeds its thermal limit (AND)"
+        expression:connective "AND"
+        expression:hasOperand C_R2_OutletLimit
+        expression:hasOperand C_R2_WallLimit
+    ]
+
+    instance C_R2_OutletLimit : expression:TemperatureComparison [
+        base:description "During operation, the outlet nitrogen temperature is at most 873.15 K (600 C)"
+        expression:constrains OutletNitrogenTemperature
+        expression:hasInput OperationMode
+        expression:comparisonOperator "LE"
+        expression:temperatureThreshold 873.15^^si:K
+    ]
+
+    instance C_R2_WallLimit : expression:TemperatureComparison [
+        base:description "During operation, the bare pipe surface temperature is at most 923.15 K (650 C)"
+        expression:constrains BarePipeSurfaceTemperature
+        expression:hasInput OperationMode
+        expression:comparisonOperator "LE"
+        expression:temperatureThreshold 923.15^^si:K
+    ]
+
+    // R3: a single categorical leaf
+    instance C_R3 : expression:Predicate [
+        base:description "During operation, the composition of the delivered gas is nitrogen"
+        expression:constrains OutletGasComposition
+        expression:hasInput OperationMode
+        expression:comparisonOperator "EQ"
+        expression:targetValue "nitrogen"
+    ]
+
+    // R4: for all accessible surfaces, during maintenance
+    instance C_R4 : expression:QuantifiedCondition [
+        base:description "During maintenance, for every accessible surface temperature in the set, the touch limit holds (ForAll)"
+        expression:quantifier "ForAll"
+        expression:quantifiesOver AccessibleSurfaceTemperatures
+        expression:hasBody C_R4_TouchLimit
+    ]
+
+    instance C_R4_TouchLimit : expression:TemperatureComparison [
+        base:description "During maintenance, an accessible surface temperature is at most 323.15 K (50 C)"
+        expression:constrains AccessibleSurfaceTemperatures
+        expression:hasInput MaintenanceMode
+        expression:comparisonOperator "LE"
+        expression:temperatureThreshold 323.15^^si:K
+    ]
+
+    // R5: a single power leaf
+    instance C_R5 : expression:PowerComparison [
+        base:description "During operation, at the design solar irradiance of 800 W/m2 or more, the captured solar power is at least 2.0 kW"
+        expression:constrains CapturedSolarPower
+        expression:hasInput OperationMode
+        expression:hasInput SolarIrradiance
+        expression:comparisonOperator "GE"
+        expression:powerThreshold 2.0^^units:kW
+    ]
+
+    //
+    // Testing strategies
+    //
+
+    instance TS_ThermalSimulation : requirement:TestingStrategy [
+        base:description "Thermal simulation of the oven, pipe and gas over the sunlight range"
+        requirement:hasVerificationMethod "Analysis"
+    ]
+
+    instance TS_DesignInspection : requirement:TestingStrategy [
+        base:description "Inspection of the sealing and material design against the inert-gas requirement"
+        requirement:hasVerificationMethod "Inspection"
+    ]
+
+    instance TS_MaintenanceDemonstration : requirement:TestingStrategy [
+        base:description "Simulated maintenance run showing accessible surfaces below the touch limit"
+        requirement:hasVerificationMethod "Demonstration"
+    ]
+}

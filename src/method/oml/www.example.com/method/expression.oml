@@ -1,0 +1,98 @@
+@dc:title "Expression Vocabulary"
+@dc:description "Conditions over outputs: atomic predicates and comparisons, aggregated by logical connectives and quantifiers."
+vocabulary <http://www.example.com/method/expression#> as expression {
+    extends <http://purl.org/dc/elements/1.1/> as dc
+    extends <http://www.w3.org/2001/XMLSchema#> as xsd
+    extends <http://www.example.com/method/base#> as base
+    extends <http://opencaesar.io/isq/> as isq
+    extends <http://www.example.com/method/units#> as units
+
+    //--- enumerations ---
+    scalar ComparisonOperator [ oneOf "EQ","NE","GT","GE","LT","LE" ] //= xsd:string   (NE covers negation)
+    scalar LogicalConnective  [ oneOf "AND","OR" ]                    //= xsd:string
+    scalar Quantifier         [ oneOf "ForAll","Exists" ]             //= xsd:string
+    scalar ExchangeKind       [ oneOf "Abstraction","Energy","Matter" ] //= xsd:string   (modes are Abstraction)
+
+    //--- what a condition talks about ---
+    @dc:description "Something that crosses the system boundary: qualified as abstraction (e.g. a mode), energy, or matter."
+    aspect Exchanged
+
+    @dc:description "A thing observations are taken on: a flow, a part, a region, a state. Not an architectural component."
+    concept Entity < base:Element
+
+    @dc:description "An entity with a physical extent: a flow, a part, a region of the world."
+    concept PhysicalEntity < Entity
+
+    @dc:description "An entity with no physical extent: a state machine, a lifecycle, a plan."
+    concept AbstractEntity < Entity
+
+    @dc:description "The measured variable a condition constrains."
+    concept Output < base:Element, Exchanged [ restricts hasExchangeKind to exactly 1 ]
+
+    @dc:description "A variable imposed on the system: physical inputs (sunlight, inlet flow) and imposed modes (operation, maintenance)."
+    concept Input  < base:Element, Exchanged [ restricts hasExchangeKind to exactly 1 ]
+
+    scalar property hasExchangeKind [ domain Exchanged range ExchangeKind functional ]
+
+    // --- the condition tree ---
+    @dc:description "Abstract: instantiate only Predicate, Comparison, CompoundCondition or QuantifiedCondition."
+    concept Condition < base:Expressible, base:Element
+
+    concept AtomicCondition < Condition [          // the leaf tier: output + operator + value
+        restricts constrains to exactly 1
+        restricts comparisonOperator to exactly 1
+    ]
+    concept Predicate  < AtomicCondition [ restricts targetValue    to exactly 1 ]   // categorical value (EQ/NE)
+    concept Comparison < AtomicCondition   // numeric value, carried with its unit by the subtype
+    concept TemperatureComparison < Comparison [ restricts temperatureThreshold to exactly 1 ]
+    concept MassFlowComparison    < Comparison [ restricts massFlowThreshold    to exactly 1 ]
+    concept PowerComparison       < Comparison [ restricts powerThreshold       to exactly 1 ]
+
+    concept CompoundCondition < Condition [        // AND/OR over >= 2 whole conditions
+        restricts hasOperand to min 2
+        restricts connective to exactly 1
+    ]
+    concept QuantifiedCondition < Condition [      // ForAll/Exists X in a set: body holds
+        restricts quantifier     to exactly 1
+        restricts quantifiesOver to exactly 1
+        restricts hasBody        to exactly 1
+    ]
+
+    // --- properties: each subtype adds its own ---
+    scalar property comparisonOperator [ domain AtomicCondition     range ComparisonOperator functional ]
+    scalar property targetValue        [ domain Predicate           range xsd:string         functional ]
+    // thresholds carry their unit: 673.15^^si:K, 1.8^^units:kg_per_h, 2.0^^units:kW
+    quantity property temperatureThreshold [ domain TemperatureComparison quantity isq:Temperature     functional ]
+    quantity property massFlowThreshold    [ domain MassFlowComparison    quantity units:MassFlowRate  functional ]
+    quantity property powerThreshold       [ domain PowerComparison       quantity units:Power         functional ]
+    quantity property irradianceLevel      [ domain Exchanged             quantity units:Irradiance    functional ]   // design point of an observable
+    quantity property apertureArea         [ domain Entity                quantity units:Area          functional ]
+    scalar property connective         [ domain CompoundCondition   range LogicalConnective  functional ]
+    scalar property quantifier         [ domain QuantifiedCondition range Quantifier         functional ]
+
+    // --- relations ---
+    relation constrains [ from AtomicCondition to Output reverse isConstrainedBy ]
+    relation hasPart [                             // entity composition: a pipe has its sections
+        from Entity to Entity
+        reverse isPartOf
+        asymmetric irreflexive ]
+    relation observedOn [                          // FACE-style: an Entity exhibits observables
+        from Exchanged to Entity
+        reverse exhibits
+        functional ]
+    relation hasInput   [ from AtomicCondition to Input reverse isInputTo ]   // context lives on the leaves, not on compounds/quantifiers
+    relation hasOperand [
+        from CompoundCondition to Condition
+        reverse isOperandOf asymmetric irreflexive ]
+    relation quantifiesOver [                      // exactly one set; mixed kinds = user defines a set Output (e.g. munitions)
+        from QuantifiedCondition to Output
+        reverse isQuantifiedBy
+        functional ]
+    relation hasBody [
+        from QuantifiedCondition to Condition
+        reverse isBodyOf functional asymmetric irreflexive ]
+    relation hasMember [                           // set membership between outputs: munitions hasMember missiles, bombs
+        from Output to Output
+        reverse isMemberOf
+        transitive ]                               // no asymmetric/irreflexive: OWL 2 DL forbids them on transitive relations
+}

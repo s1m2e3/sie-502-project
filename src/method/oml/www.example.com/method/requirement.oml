@@ -1,0 +1,42 @@
+@dc:title "Requirement Vocabulary"
+@dc:description "Stakeholders, the requirements they raise, the conditions those impose, and the testing strategies that verify them."
+vocabulary <http://www.example.com/method/requirement#> as requirement {
+    extends <http://purl.org/dc/elements/1.1/> as dc
+    extends <http://www.example.com/method/base#> as base
+    extends <http://www.example.com/method/expression#> as expression
+
+    scalar VerificationMethodKind [ oneOf "Analysis","Inspection","Test","Demonstration" ]
+
+    @dc:description "A party with a concern in the system; only modeled if it raises at least one requirement."
+    concept Stakeholder < base:Element [
+        restricts raises to min 1
+    ]
+
+    concept Requirement < base:Element, base:Expressible[
+         restricts hasCondition to exactly 1 
+    ]
+    scalar property hasVerificationMethod [ domain TestingStrategy range VerificationMethodKind functional ]
+
+    concept TestingStrategy < base:Element [
+        restricts hasVerificationMethod to exactly 1
+    ]
+
+    relation raises [
+        from Stakeholder
+        to Requirement
+        reverse isRaisedBy
+    ]
+
+    relation hasCondition [
+        from Requirement 
+        to expression:Condition
+        reverse isConditionOf
+        functional
+    ]
+    
+    relation isVerifiedBy [
+    from Requirement
+    to TestingStrategy
+    reverse verifies
+    ]
+}
