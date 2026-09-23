@@ -1,0 +1,7 @@
+@dc:title "Solar Oven Project Bundle"
+@dc:description "All solar-oven descriptions, reasoned together against the closed method."
+description bundle <http://www.example.com/project/bundle#> as d-bundle {
+    uses <http://purl.org/dc/elements/1.1/> as dc
+    uses <http://www.example.com/method/bundle#>
+    includes <http://www.example.com/project/description#>
+}

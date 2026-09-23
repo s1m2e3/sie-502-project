@@ -1,0 +1,9 @@
+@dc:title "Solar Oven Method Bundle"
+@dc:description "Closes the method vocabularies so sibling concepts are treated as disjoint."
+vocabulary bundle <http://www.example.com/method/bundle#> as v-bundle {
+    includes <http://purl.org/dc/elements/1.1/> as dc
+    includes <http://www.example.com/method/base#>
+    includes <http://www.example.com/method/units#>
+    includes <http://www.example.com/method/expression#>
+    includes <http://www.example.com/method/requirement#>
+}
