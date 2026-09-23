@@ -133,7 +133,7 @@ description <http://www.example.com/project/description#> as myproject-desc {
         requirement:raises R4
     ]
 
-    instance SafetyRegulators : requirement:Stakeholder [
+    instance SafetyRegulators : requirement:Regulator [
         base:description "Industrial safety and compliance regulators"
         requirement:raises R2
         requirement:raises R4

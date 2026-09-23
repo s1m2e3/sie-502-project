@@ -39,4 +39,12 @@ vocabulary <http://www.example.com/method/requirement#> as requirement {
     to TestingStrategy
     reverse verifies
     ]
+
+    @dc:description "A stakeholder with regulatory authority over the system (safety, compliance)."
+    concept Regulator < Stakeholder
+
+    @dc:description "Defined: any requirement raised by a regulator. The reasoner classifies these; they are never asserted."
+    concept SafetyRequirement = Requirement [
+        restricts some isRaisedBy to Regulator
+    ]
 }

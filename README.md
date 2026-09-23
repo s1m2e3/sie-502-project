@@ -40,7 +40,7 @@ These come from Project Deliverable 1:
 | Question | How the model answers it |
 | --- | --- |
 | Are the safety requirements on the **inputs** traced to a verification strategy? | Follow `Requirement → hasCondition → hasInput`, then `Requirement → isVerifiedBy → TestingStrategy` |
-| Are the safety requirements on the **outputs** traced to a verification strategy? | Follow `Condition → constrains → Output`, then `isVerifiedBy` (R2 and R4 are the safety requirements) |
+| Are the safety requirements on the **outputs** traced to a verification strategy? | Follow `Condition → constrains → Output`, then `isVerifiedBy`. The reasoner classifies R2 and R4 as `SafetyRequirement` |
 | How do the components react to changes in the input? | *Partially.* The model states which outputs each input affects and what thresholds apply. The actual response needs a simulation (see below) |
 | How does reactor capacity react to changes in sunlight? | *Partially.* R1 and R5 tie irradiance to the outlet temperature, the mass flow and the captured power. Working out the response curve needs a simulation |
 | Can components be replaced as modules? | Not yet modeled. It needs an architecture layer (future deliverable) |
@@ -95,7 +95,10 @@ oml export -o build/owl    # export to OWL
 - **Design consequence:** `Input` and `Output` are now disjoint. An intermediate variable that
   is both (such as the bare-pipe temperature: an output of the lens and an input to heating
   the gas) would need a shared subconcept, for example `InternalVariable < Input, Output`.
-- **Defined concept (Week 3 requirement): not yet added.** The candidate is a thermal-safety
-  requirement defined by its condition's temperature comparison, so the reasoner classifies it.
+- **Defined concept: done.** `SafetyRequirement = Requirement [ restricts some isRaisedBy to Regulator ]`.
+  R2 and R4 are never asserted as safety requirements. The reasoner classifies them because
+  `SafetyRegulators` (a `Regulator`) raises them, and a new requirement raised by a regulator
+  would be classified the same way. Under the open world the reasoner cannot flag a safety
+  requirement that lacks a testing strategy; that check belongs in SHACL (`oml validate`).
 - The architecture (pipe material, modular components) is intentionally left out so far.
 - Checking behavior over the sunlight range needs a simulation. See *About simulation* above.
