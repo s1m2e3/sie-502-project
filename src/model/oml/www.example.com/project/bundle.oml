@@ -3,5 +3,9 @@
 description bundle <http://www.example.com/project/bundle#> as d-bundle {
     uses <http://purl.org/dc/elements/1.1/> as dc
     uses <http://www.example.com/method/bundle#>
-    includes <http://www.example.com/project/description#>
+    includes <http://www.example.com/project/system#>
+    includes <http://www.example.com/project/conditions#>
+    includes <http://www.example.com/project/verification#>
+    includes <http://www.example.com/project/requirements#>
+    includes <http://www.example.com/project/stakeholders#>
 }

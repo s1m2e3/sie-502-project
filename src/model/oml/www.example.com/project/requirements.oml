@@ -1,0 +1,51 @@
+@dc:title "Requirements"
+@dc:description "The requirements on the solar oven. Each one has exactly one condition and is raised by at least one stakeholder."
+description <http://www.example.com/project/requirements#> as requirements {
+    uses <http://purl.org/dc/elements/1.1/> as dc
+    uses <http://www.example.com/method/base#> as base
+    uses <http://www.example.com/method/requirement#> as requirement
+    extends <http://www.example.com/project/conditions#> as conditions
+    extends <http://www.example.com/project/verification#> as verification
+    extends <http://www.example.com/project/stakeholders#> as stakeholders
+
+    instance R1 : requirement:Requirement [
+        base:description "Delivery of hot nitrogen"
+        base:expression "During operation, at the design solar irradiance of 800 W/m2 or more, the system shall deliver nitrogen to the pyrolysis reactor at 673.15 K or more and at 1.8 kg/h or more."
+        requirement:isRaisedBy stakeholders:ReactorManagers
+        requirement:hasCondition conditions:C_R1
+        requirement:isVerifiedBy verification:TS_ThermalSimulation
+    ]
+
+    instance R2 : requirement:Requirement [
+        base:description "Thermal safety of the heated pipe"
+        base:expression "During operation the outlet nitrogen shall stay at or below 873.15 K and the bare pipe surface at or below 923.15 K."
+        requirement:isRaisedBy stakeholders:SafetyRegulators
+        requirement:hasCondition conditions:C_R2
+        requirement:isVerifiedBy verification:TS_ThermalSimulation
+    ]
+
+    instance R3 : requirement:Requirement [
+        base:description "Inert gas delivered"
+        base:expression "During operation the system shall deliver gas whose composition is nitrogen, so that no oxygen reaches the pyrolysis reactor."
+        requirement:isRaisedBy stakeholders:ReactorManagers
+        requirement:hasCondition conditions:C_R3
+        requirement:isVerifiedBy verification:TS_DesignInspection
+    ]
+
+    instance R4 : requirement:Requirement [
+        base:description "Touch safety during maintenance"
+        base:expression "During maintenance every accessible surface of the system shall stay at or below 323.15 K."
+        requirement:isRaisedBy stakeholders:MaintenanceOperators
+        requirement:isRaisedBy stakeholders:SafetyRegulators
+        requirement:hasCondition conditions:C_R4
+        requirement:isVerifiedBy verification:TS_MaintenanceDemonstration
+    ]
+
+    instance R5 : requirement:Requirement [
+        base:description "Solar capture capacity"
+        base:expression "During operation, at the design solar irradiance of 800 W/m2 or more, the lens shall concentrate at least 2.0 kW onto the pipe."
+        requirement:isRaisedBy stakeholders:PlantManagers
+        requirement:hasCondition conditions:C_R5
+        requirement:isVerifiedBy verification:TS_ThermalSimulation
+    ]
+}

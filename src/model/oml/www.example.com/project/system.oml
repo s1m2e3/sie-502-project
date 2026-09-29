@@ -1,0 +1,113 @@
+@dc:title "System"
+@dc:description "The observable system: inputs imposed on the solar oven, the entities observations are taken on, and the outputs measured on them. No architecture is implied."
+description <http://www.example.com/project/system#> as system {
+    uses <http://purl.org/dc/elements/1.1/> as dc
+    uses <http://www.example.com/method/base#> as base
+    uses <http://www.example.com/method/expression#> as expression
+    uses <http://www.example.com/method/units#> as units
+
+    //
+    // Inputs: what the environment and the stakeholders impose on the solar oven
+    //
+
+    instance SolarIrradiance : expression:Input [
+        base:description "Direct solar irradiance at the installation site"
+        expression:hasExchangeKind "Energy"
+        expression:irradianceLevel 800.0^^units:W_per_m2
+    ]
+
+    instance OperationMode : expression:Input [
+        base:description "The system is running and heating nitrogen for the pyrolysis reactor"
+        expression:hasExchangeKind "Abstraction"
+    ]
+
+    instance MaintenanceMode : expression:Input [
+        base:description "The system is stopped and handled by maintenance personnel"
+        expression:hasExchangeKind "Abstraction"
+    ]
+
+    //
+    // Entities: the things observations are taken on (no architecture implied)
+    //
+
+    instance NitrogenStream : expression:PhysicalEntity [
+        base:description "The nitrogen flowing from the generator, through the pipe, to the pyrolysis reactor"
+        expression:exhibits OutletNitrogenTemperature
+        expression:exhibits OutletNitrogenMassFlow
+        expression:exhibits OutletGasComposition
+    ]
+
+    instance Pipe : expression:PhysicalEntity [
+        base:description "The pipe that carries the nitrogen through the solar oven; its material is not yet chosen"
+        expression:hasPart InsulatedPipeSection
+        expression:hasPart BarePipeSection
+    ]
+
+    instance InsulatedPipeSection : expression:PhysicalEntity [
+        base:description "The insulated run of the pipe, outside the solar oven"
+        expression:exhibits InsulatedPipeSurfaceTemperature
+    ]
+
+    instance BarePipeSection : expression:PhysicalEntity [
+        base:description "The uninsulated run of the pipe, inside the solar oven where it takes the concentrated sunlight"
+        expression:exhibits BarePipeSurfaceTemperature
+    ]
+
+    instance InstallationSite : expression:PhysicalEntity [
+        base:description "The region of the world the system is installed in; it receives the sunlight the lens later concentrates"
+        expression:exhibits SolarIrradiance
+    ]
+
+    instance FresnelLens : expression:PhysicalEntity [
+        base:description "The Fresnel lens that concentrates site sunlight onto the bare pipe section"
+        expression:apertureArea 1.5^^units:m2
+        expression:exhibits CapturedSolarPower
+    ]
+
+    instance SystemState : expression:AbstractEntity [
+        base:description "The state the system is held in by its operators; it has no physical extent"
+        expression:exhibits OperationMode
+        expression:exhibits MaintenanceMode
+    ]
+
+    //
+    // Outputs: what the system delivers and what can be measured on it
+    //
+
+    instance CapturedSolarPower : expression:Output [
+        base:description "Solar power the lens concentrates onto the pipe, in W"
+        expression:hasExchangeKind "Energy"
+    ]
+
+    instance OutletNitrogenTemperature : expression:Output [
+        base:description "Temperature of the nitrogen delivered to the pyrolysis reactor, in K"
+        expression:hasExchangeKind "Energy"
+    ]
+
+    instance OutletNitrogenMassFlow : expression:Output [
+        base:description "Mass flow of nitrogen delivered to the pyrolysis reactor, in kg/h"
+        expression:hasExchangeKind "Matter"
+    ]
+
+    instance OutletGasComposition : expression:Output [
+        base:description "Composition of the gas leaving the pipe; must stay inert for pyrolysis"
+        expression:hasExchangeKind "Matter"
+    ]
+
+    instance InsulatedPipeSurfaceTemperature : expression:Output [
+        base:description "Surface temperature of the insulated pipe section, in K"
+        expression:hasExchangeKind "Energy"
+    ]
+
+    instance BarePipeSurfaceTemperature : expression:Output [
+        base:description "Surface temperature of the bare pipe section, in K"
+        expression:hasExchangeKind "Energy"
+    ]
+
+    instance AccessibleSurfaceTemperatures : expression:Output [
+        base:description "The set of surface temperatures a maintainer can reach during maintenance"
+        expression:hasExchangeKind "Energy"
+        expression:hasMember InsulatedPipeSurfaceTemperature
+        expression:hasMember BarePipeSurfaceTemperature
+    ]
+}

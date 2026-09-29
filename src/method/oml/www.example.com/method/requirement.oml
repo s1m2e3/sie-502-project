@@ -7,13 +7,16 @@ vocabulary <http://www.example.com/method/requirement#> as requirement {
 
     scalar VerificationMethodKind [ oneOf "Analysis","Inspection","Test","Demonstration" ]
 
-    @dc:description "A party with a concern in the system; only modeled if it raises at least one requirement."
+    @dc:description "A party with a stake in the system. Modeled only if it raises at least one requirement; otherwise it is redundant."
     concept Stakeholder < base:Element [
         restricts raises to min 1
     ]
 
-    concept Requirement < base:Element, base:Expressible[
-         restricts hasCondition to exactly 1 
+    @dc:description "A single, verifiable statement of need. Every requirement must be raised by at least one stakeholder and verified by at least one testing strategy."
+    concept Requirement < base:Element, base:Expressible [
+        restricts hasCondition to exactly 1
+        restricts isRaisedBy to min 1
+        restricts isVerifiedBy to min 1
     ]
     scalar property hasVerificationMethod [ domain TestingStrategy range VerificationMethodKind functional ]
 

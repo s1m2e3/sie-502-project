@@ -1,0 +1,22 @@
+@dc:title "Verification"
+@dc:description "The testing strategies that verify the requirements."
+description <http://www.example.com/project/verification#> as verification {
+    uses <http://purl.org/dc/elements/1.1/> as dc
+    uses <http://www.example.com/method/base#> as base
+    uses <http://www.example.com/method/requirement#> as requirement
+
+    instance TS_ThermalSimulation : requirement:TestingStrategy [
+        base:description "Thermal simulation of the oven, pipe and gas over the sunlight range"
+        requirement:hasVerificationMethod "Analysis"
+    ]
+
+    instance TS_DesignInspection : requirement:TestingStrategy [
+        base:description "Inspection of the sealing and material design against the inert-gas requirement"
+        requirement:hasVerificationMethod "Inspection"
+    ]
+
+    instance TS_MaintenanceDemonstration : requirement:TestingStrategy [
+        base:description "Simulated maintenance run showing accessible surfaces below the touch limit"
+        requirement:hasVerificationMethod "Demonstration"
+    ]
+}

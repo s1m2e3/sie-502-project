@@ -1,0 +1,23 @@
+@dc:title "Stakeholders"
+@dc:description "The parties with a stake in the solar oven. Each one raises at least one requirement."
+description <http://www.example.com/project/stakeholders#> as stakeholders {
+    uses <http://purl.org/dc/elements/1.1/> as dc
+    uses <http://www.example.com/method/base#> as base
+    uses <http://www.example.com/method/requirement#> as requirement
+
+    instance ReactorManagers : requirement:Stakeholder [
+        base:description "Pyrolysis reactor subsystem managers"
+    ]
+
+    instance PlantManagers : requirement:Stakeholder [
+        base:description "Plant managers and owners"
+    ]
+
+    instance MaintenanceOperators : requirement:Stakeholder [
+        base:description "Maintenance operators of the system"
+    ]
+
+    instance SafetyRegulators : requirement:Regulator [
+        base:description "Industrial safety and compliance regulators"
+    ]
+}
