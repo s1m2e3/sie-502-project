@@ -7,7 +7,7 @@ vocabulary <http://www.example.com/method/requirement#> as requirement {
 
     scalar VerificationMethodKind [ oneOf "Analysis","Inspection","Test","Demonstration" ]
 
-    @dc:description "A party with a stake in the system. Modeled only if it raises at least one requirement; otherwise it is redundant."
+    @dc:description "A party with a stake in the system. Modeled only if it raises at least one requirement; otherwise it is redundant. Never instantiated directly: every stakeholder is a Regulator, InternalClient, ExternalClient, Press, or Provider."
     concept Stakeholder < base:Element [
         restricts raises to min 1
     ]
@@ -45,6 +45,18 @@ vocabulary <http://www.example.com/method/requirement#> as requirement {
 
     @dc:description "A stakeholder with regulatory authority over the system (safety, compliance)."
     concept Regulator < Stakeholder
+
+    @dc:description "A party inside the owning organization that uses or runs the system (plant managers, operators, maintenance)."
+    concept InternalClient < Stakeholder
+
+    @dc:description "A party outside the owning organization that buys from or depends on the system's output."
+    concept ExternalClient < Stakeholder
+
+    @dc:description "Media that report on the system, its safety, or its environmental impact."
+    concept Press < Stakeholder
+
+    @dc:description "A supplier of components, materials, or services for the system."
+    concept Provider < Stakeholder
 
     @dc:description "Defined: any requirement raised by a regulator. The reasoner classifies these; they are never asserted."
     concept SafetyRequirement = Requirement [
