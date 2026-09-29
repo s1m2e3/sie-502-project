@@ -4,6 +4,7 @@ description <http://www.example.com/project/stakeholders#> as stakeholders {
     uses <http://purl.org/dc/elements/1.1/> as dc
     uses <http://www.example.com/method/base#> as base
     uses <http://www.example.com/method/requirement#> as requirement
+    uses <http://www.w3.org/2000/01/rdf-schema#> as rdfs
 
     instance ReactorManagers : requirement:InternalClient [
         base:description "Pyrolysis reactor subsystem managers"
@@ -19,5 +20,10 @@ description <http://www.example.com/project/stakeholders#> as stakeholders {
 
     instance SafetyRegulators : requirement:Regulator [
         base:description "Industrial safety and compliance regulators"
+    ]
+
+    @rdfs:label "hi"
+    instance Regulator1 : requirement:Regulator [
+        base:description "they are a regulator"
     ]
 }

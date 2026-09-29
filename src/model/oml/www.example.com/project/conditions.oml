@@ -51,12 +51,11 @@ description <http://www.example.com/project/conditions#> as conditions {
     instance C_R1 : expression:CompoundCondition [
         base:description "During operation, at the design solar irradiance of 800 W/m2 or more: both the outlet temperature and the outlet flow conditions hold (AND)"
         expression:connective "AND"
-        expression:hasOperand C_R1_Temperature
-        expression:hasOperand C_R1_Flow
     ]
 
     instance C_R1_Temperature : expression:Comparison [
         base:description "During operation, at the design solar irradiance of 800 W/m2 or more, the outlet nitrogen temperature is at least 673.15 K (400 C)"
+        expression:isOperandOf C_R1
         expression:constrains system:OutletNitrogenTemperature
         expression:hasInput system:OperationMode
         expression:hasInput system:SolarIrradiance
@@ -66,6 +65,7 @@ description <http://www.example.com/project/conditions#> as conditions {
 
     instance C_R1_Flow : expression:Comparison [
         base:description "During operation, the outlet nitrogen mass flow is at least 1.8 kg/h"
+        expression:isOperandOf C_R1
         expression:constrains system:OutletNitrogenMassFlow
         expression:hasInput system:OperationMode
         expression:comparisonOperator "GE"
@@ -76,12 +76,11 @@ description <http://www.example.com/project/conditions#> as conditions {
     instance C_R2 : expression:CompoundCondition [
         base:description "During operation: neither the delivered gas nor the pipe exceeds its thermal limit (AND)"
         expression:connective "AND"
-        expression:hasOperand C_R2_OutletLimit
-        expression:hasOperand C_R2_WallLimit
     ]
 
     instance C_R2_OutletLimit : expression:Comparison [
         base:description "During operation, the outlet nitrogen temperature is at most 873.15 K (600 C)"
+        expression:isOperandOf C_R2
         expression:constrains system:OutletNitrogenTemperature
         expression:hasInput system:OperationMode
         expression:comparisonOperator "LE"
@@ -90,6 +89,7 @@ description <http://www.example.com/project/conditions#> as conditions {
 
     instance C_R2_WallLimit : expression:Comparison [
         base:description "During operation, the bare pipe surface temperature is at most 923.15 K (650 C)"
+        expression:isOperandOf C_R2
         expression:constrains system:BarePipeSurfaceTemperature
         expression:hasInput system:OperationMode
         expression:comparisonOperator "LE"
@@ -110,11 +110,11 @@ description <http://www.example.com/project/conditions#> as conditions {
         base:description "During maintenance, for every accessible surface temperature in the set, the touch limit holds (ForAll)"
         expression:quantifier "ForAll"
         expression:quantifiesOver system:AccessibleSurfaceTemperatures
-        expression:hasBody C_R4_TouchLimit
     ]
 
     instance C_R4_TouchLimit : expression:Comparison [
         base:description "During maintenance, an accessible surface temperature is at most 323.15 K (50 C)"
+        expression:isBodyOf C_R4
         expression:constrains system:AccessibleSurfaceTemperatures
         expression:hasInput system:MaintenanceMode
         expression:comparisonOperator "LE"
