@@ -5,6 +5,7 @@ description <http://www.example.com/project/system#> as system {
     uses <http://www.example.com/method/base#> as base
     uses <http://www.example.com/method/expression#> as expression
     uses <http://www.example.com/method/units#> as units
+    extends <http://www.example.com/project/quantities#> as quantities
 
     //
     // Inputs: what the environment and the stakeholders impose on the solar oven
@@ -77,16 +78,19 @@ description <http://www.example.com/project/system#> as system {
     instance CapturedSolarPower : expression:Output [
         base:description "Solar power the lens concentrates onto the pipe, in W"
         expression:hasExchangeKind "Energy"
+        expression:hasQuantityKind quantities:Power
     ]
 
     instance OutletNitrogenTemperature : expression:Output [
         base:description "Temperature of the nitrogen delivered to the pyrolysis reactor, in K"
         expression:hasExchangeKind "Energy"
+        expression:hasQuantityKind quantities:Temperature
     ]
 
     instance OutletNitrogenMassFlow : expression:Output [
         base:description "Mass flow of nitrogen delivered to the pyrolysis reactor, in kg/h"
         expression:hasExchangeKind "Matter"
+        expression:hasQuantityKind quantities:MassFlowRate
     ]
 
     instance OutletGasComposition : expression:Output [
@@ -97,16 +101,19 @@ description <http://www.example.com/project/system#> as system {
     instance InsulatedPipeSurfaceTemperature : expression:Output [
         base:description "Surface temperature of the insulated pipe section, in K"
         expression:hasExchangeKind "Energy"
+        expression:hasQuantityKind quantities:Temperature
     ]
 
     instance BarePipeSurfaceTemperature : expression:Output [
         base:description "Surface temperature of the bare pipe section, in K"
         expression:hasExchangeKind "Energy"
+        expression:hasQuantityKind quantities:Temperature
     ]
 
     instance AccessibleSurfaceTemperatures : expression:Output [
         base:description "The set of surface temperatures a maintainer can reach during maintenance"
         expression:hasExchangeKind "Energy"
+        expression:hasQuantityKind quantities:Temperature
         expression:hasMember InsulatedPipeSurfaceTemperature
         expression:hasMember BarePipeSurfaceTemperature
     ]

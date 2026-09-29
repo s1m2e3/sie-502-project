@@ -1,0 +1,54 @@
+@dc:title "Quantities and Units"
+@dc:description "Author-owned: the quantity kinds and units the project measures in. Users request additions; the method author reviews them for physical correctness."
+description <http://www.example.com/project/quantities#> as quantities {
+    uses <http://purl.org/dc/elements/1.1/> as dc
+    uses <http://www.example.com/method/base#> as base
+    uses <http://www.example.com/method/expression#> as expression
+
+    //
+    // Quantity kinds
+    //
+
+    instance Temperature : expression:QuantityKind [
+        base:description "Thermodynamic temperature"
+        expression:hasDimension "H1"
+        expression:hasDimensionality "Dimensional"
+    ]
+
+    instance MassFlowRate : expression:QuantityKind [
+        base:description "Mass per unit time"
+        expression:hasDimension "M1 T-1"
+        expression:hasDimensionality "Dimensional"
+    ]
+
+    instance Power : expression:QuantityKind [
+        base:description "Energy per unit time"
+        expression:hasDimension "M1 L2 T-3"
+        expression:hasDimensionality "Dimensional"
+    ]
+
+    //
+    // Units
+    //
+
+    instance K : expression:Unit [
+        base:description "The kelvin, the SI unit of temperature"
+        expression:unitSymbol "K"
+        expression:measuresQuantity Temperature
+        expression:hasDimension "H1"
+    ]
+
+    instance kg_per_h : expression:Unit [
+        base:description "The kilogram per hour"
+        expression:unitSymbol "kg/h"
+        expression:measuresQuantity MassFlowRate
+        expression:hasDimension "M1 T-1"
+    ]
+
+    instance kW : expression:Unit [
+        base:description "The kilowatt (1000 W)"
+        expression:unitSymbol "kW"
+        expression:measuresQuantity Power
+        expression:hasDimension "M1 L2 T-3"
+    ]
+}

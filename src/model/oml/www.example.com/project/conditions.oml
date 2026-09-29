@@ -4,9 +4,48 @@ description <http://www.example.com/project/conditions#> as conditions {
     uses <http://purl.org/dc/elements/1.1/> as dc
     uses <http://www.example.com/method/base#> as base
     uses <http://www.example.com/method/expression#> as expression
-    uses <http://www.example.com/method/units#> as units
-    uses <http://opencaesar.io/si/> as si
+    extends <http://www.example.com/project/quantities#> as quantities
     extends <http://www.example.com/project/system#> as system
+
+    //
+    // Thresholds: one value and one unit each; comparisons point to them
+    //
+
+    instance T_MinOutletTemperature : expression:Threshold [
+        base:description "Minimum outlet nitrogen temperature (400 C)"
+        expression:thresholdValue 673.15
+        expression:hasUnit quantities:K
+    ]
+
+    instance T_MinOutletMassFlow : expression:Threshold [
+        base:description "Minimum outlet nitrogen mass flow"
+        expression:thresholdValue 1.8
+        expression:hasUnit quantities:kg_per_h
+    ]
+
+    instance T_MaxOutletTemperature : expression:Threshold [
+        base:description "Maximum outlet nitrogen temperature (600 C)"
+        expression:thresholdValue 873.15
+        expression:hasUnit quantities:K
+    ]
+
+    instance T_MaxWallTemperature : expression:Threshold [
+        base:description "Maximum bare pipe surface temperature (650 C)"
+        expression:thresholdValue 923.15
+        expression:hasUnit quantities:K
+    ]
+
+    instance T_TouchLimit : expression:Threshold [
+        base:description "Touch-safe surface temperature limit (50 C)"
+        expression:thresholdValue 323.15
+        expression:hasUnit quantities:K
+    ]
+
+    instance T_MinCapturedPower : expression:Threshold [
+        base:description "Minimum captured solar power"
+        expression:thresholdValue 2.0
+        expression:hasUnit quantities:kW
+    ]
 
     // R1: AND of two leaves
     instance C_R1 : expression:CompoundCondition [
@@ -16,21 +55,21 @@ description <http://www.example.com/project/conditions#> as conditions {
         expression:hasOperand C_R1_Flow
     ]
 
-    instance C_R1_Temperature : expression:TemperatureComparison [
+    instance C_R1_Temperature : expression:Comparison [
         base:description "During operation, at the design solar irradiance of 800 W/m2 or more, the outlet nitrogen temperature is at least 673.15 K (400 C)"
         expression:constrains system:OutletNitrogenTemperature
         expression:hasInput system:OperationMode
         expression:hasInput system:SolarIrradiance
         expression:comparisonOperator "GE"
-        expression:temperatureThreshold 673.15^^si:K
+        expression:hasThreshold T_MinOutletTemperature
     ]
 
-    instance C_R1_Flow : expression:MassFlowComparison [
+    instance C_R1_Flow : expression:Comparison [
         base:description "During operation, the outlet nitrogen mass flow is at least 1.8 kg/h"
         expression:constrains system:OutletNitrogenMassFlow
         expression:hasInput system:OperationMode
         expression:comparisonOperator "GE"
-        expression:massFlowThreshold 1.8^^units:kg_per_h
+        expression:hasThreshold T_MinOutletMassFlow
     ]
 
     // R2: AND of two leaves
@@ -41,20 +80,20 @@ description <http://www.example.com/project/conditions#> as conditions {
         expression:hasOperand C_R2_WallLimit
     ]
 
-    instance C_R2_OutletLimit : expression:TemperatureComparison [
+    instance C_R2_OutletLimit : expression:Comparison [
         base:description "During operation, the outlet nitrogen temperature is at most 873.15 K (600 C)"
         expression:constrains system:OutletNitrogenTemperature
         expression:hasInput system:OperationMode
         expression:comparisonOperator "LE"
-        expression:temperatureThreshold 873.15^^si:K
+        expression:hasThreshold T_MaxOutletTemperature
     ]
 
-    instance C_R2_WallLimit : expression:TemperatureComparison [
+    instance C_R2_WallLimit : expression:Comparison [
         base:description "During operation, the bare pipe surface temperature is at most 923.15 K (650 C)"
         expression:constrains system:BarePipeSurfaceTemperature
         expression:hasInput system:OperationMode
         expression:comparisonOperator "LE"
-        expression:temperatureThreshold 923.15^^si:K
+        expression:hasThreshold T_MaxWallTemperature
     ]
 
     // R3: a single categorical leaf
@@ -74,21 +113,21 @@ description <http://www.example.com/project/conditions#> as conditions {
         expression:hasBody C_R4_TouchLimit
     ]
 
-    instance C_R4_TouchLimit : expression:TemperatureComparison [
+    instance C_R4_TouchLimit : expression:Comparison [
         base:description "During maintenance, an accessible surface temperature is at most 323.15 K (50 C)"
         expression:constrains system:AccessibleSurfaceTemperatures
         expression:hasInput system:MaintenanceMode
         expression:comparisonOperator "LE"
-        expression:temperatureThreshold 323.15^^si:K
+        expression:hasThreshold T_TouchLimit
     ]
 
     // R5: a single power leaf
-    instance C_R5 : expression:PowerComparison [
+    instance C_R5 : expression:Comparison [
         base:description "During operation, at the design solar irradiance of 800 W/m2 or more, the captured solar power is at least 2.0 kW"
         expression:constrains system:CapturedSolarPower
         expression:hasInput system:OperationMode
         expression:hasInput system:SolarIrradiance
         expression:comparisonOperator "GE"
-        expression:powerThreshold 2.0^^units:kW
+        expression:hasThreshold T_MinCapturedPower
     ]
 }

@@ -4,7 +4,6 @@ vocabulary <http://www.example.com/method/expression#> as expression {
     extends <http://purl.org/dc/elements/1.1/> as dc
     extends <http://www.w3.org/2001/XMLSchema#> as xsd
     extends <http://www.example.com/method/base#> as base
-    extends <http://opencaesar.io/isq/> as isq
     extends <http://www.example.com/method/units#> as units
 
     //--- enumerations ---
@@ -43,10 +42,8 @@ vocabulary <http://www.example.com/method/expression#> as expression {
         restricts comparisonOperator to exactly 1
     ]
     concept Predicate  < AtomicCondition [ restricts targetValue    to exactly 1 ]   // categorical value (EQ/NE)
-    concept Comparison < AtomicCondition   // numeric value, carried with its unit by the subtype
-    concept TemperatureComparison < Comparison [ restricts temperatureThreshold to exactly 1 ]
-    concept MassFlowComparison    < Comparison [ restricts massFlowThreshold    to exactly 1 ]
-    concept PowerComparison       < Comparison [ restricts powerThreshold       to exactly 1 ]
+    @dc:description "A numeric bound on an output: exactly one operator against exactly one threshold. A range is two comparisons (lower and upper bound) joined by AND."
+    concept Comparison < AtomicCondition [ restricts hasThreshold to exactly 1 ]
 
     concept CompoundCondition < Condition [        // AND/OR over >= 2 whole conditions
         restricts hasOperand to min 2
@@ -58,17 +55,48 @@ vocabulary <http://www.example.com/method/expression#> as expression {
         restricts hasBody        to exactly 1
     ]
 
-    // --- properties: each subtype adds its own ---
+    // --- properties ---
     scalar property comparisonOperator [ domain AtomicCondition     range ComparisonOperator functional ]
     scalar property targetValue        [ domain Predicate           range xsd:string         functional ]
-    // thresholds carry their unit: 673.15^^si:K, 1.8^^units:kg_per_h, 2.0^^units:kW
-    quantity property temperatureThreshold [ domain TemperatureComparison quantity isq:Temperature     functional ]
-    quantity property massFlowThreshold    [ domain MassFlowComparison    quantity units:MassFlowRate  functional ]
-    quantity property powerThreshold       [ domain PowerComparison       quantity units:Power         functional ]
     quantity property irradianceLevel      [ domain Exchanged             quantity units:Irradiance    functional ]   // design point of an observable
     quantity property apertureArea         [ domain Entity                quantity units:Area          functional ]
     scalar property connective         [ domain CompoundCondition   range LogicalConnective  functional ]
     scalar property quantifier         [ domain QuantifiedCondition range Quantifier         functional ]
+
+    // --- measurements: quantity kinds, units and thresholds are data, so users can add new ones ---
+    @dc:description "Something with a physical dimension, written as exponents of the ISQ base dimensions (e.g. M1 L2 T-3 for power, H1 for temperature). Dimensionless quantities have dimension 1."
+    aspect Dimensioned
+    scalar property hasDimension [ domain Dimensioned range xsd:string functional ]
+
+    @dc:description "Whether a quantity kind has a physical dimension (temperature, power) or is dimensionless (ratios, efficiencies, statistical metrics)."
+    scalar Dimensionality [ oneOf "Dimensional","Dimensionless" ]
+    scalar property hasDimensionality [ domain QuantityKind range Dimensionality functional ]
+
+    @dc:description "A kind of quantity: dimensional (temperature, mass flow rate, power) or dimensionless (efficiency, coefficient of variation). Defined on the author-owned Quantities and Units page."
+    concept QuantityKind < base:Element, Dimensioned [
+        restricts hasDimension to exactly 1
+        restricts hasDimensionality to exactly 1
+    ]
+
+    @dc:description "A unit of measure (K, kg/h, kW). Measures exactly one quantity kind and must share its dimension. Defined on the author-owned Quantities and Units page."
+    concept Unit < base:Element, Dimensioned [
+        restricts measuresQuantity to exactly 1
+        restricts hasDimension to exactly 1
+        restricts unitSymbol to exactly 1
+    ]
+    scalar property unitSymbol [ domain Unit range xsd:string functional ]
+
+    @dc:description "A numeric value with its unit, used as the bound of a comparison."
+    concept Threshold < base:Element [
+        restricts thresholdValue to exactly 1
+        restricts hasUnit to exactly 1
+    ]
+    scalar property thresholdValue [ domain Threshold range xsd:decimal functional ]
+
+    relation measuresQuantity [ from Unit to QuantityKind reverse isMeasuredIn functional ]
+    relation hasUnit [ from Threshold to Unit reverse isUnitOf functional ]
+    relation hasThreshold [ from Comparison to Threshold reverse isThresholdOf functional ]
+    relation hasQuantityKind [ from Output to QuantityKind reverse isQuantityKindOf functional ]   // numeric outputs only; categorical ones have none
 
     // --- relations ---
     relation constrains [ from AtomicCondition to Output reverse isConstrainedBy ]
