@@ -202,53 +202,9 @@ ORDER BY ?requirement ?comparison
 
 ---
 
-## What dogfooding showed
+## Dogfooding
 
-Thirteen instances were entered through the editors above, in pipeline order:
-
-| Step | Instances |
-| --- | --- |
-| Stakeholders | ProductBuyers (External Client), LensSupplier (Provider), LocalMedia (Press) |
-| Testing Strategies | TS_InsulationInspection (Inspection), TS_LensPowerTest (Test) |
-| Thresholds | T_MaxInsulatedSurface (333.15 K), T_MaxCapturedPower (3.0 kW) |
-| Condition tree | C_R6 (comparison), C_R7 (AND) with C_R7_Lower and C_R7_Upper |
-| Requirements | R6, R7, and R1 gained a second stakeholder (ProductBuyers) |
-
-C_R7 is the method's range pattern in use: a lower comparison (GE, reusing the existing
-T_MinCapturedPower) and an upper comparison (LE, T_MaxCapturedPower) under one AND.
-
-### What the reasoner inferred
-
-R6 was entered as a plain Requirement. Because one of the stakeholders who raised it
-(SafetyRegulators) is a Regulator, `oml reason -o` classified it as a SafetyRequirement, as it
-already did for R2 and R4. Nobody chose that type; it follows from the definition.
-
-### Rule trips
-
-Each rule was broken on purpose, checked, then undone.
-
-| Trip | Editor | `oml reason` | `oml validate` |
-| --- | --- | --- | --- |
-| Remove C_R6's threshold | refused: the field is required | passed | "A comparison states exactly one bound, so it uses exactly one threshold." |
-| Move C_R7_Upper under C_R6 (a leaf) | allowed | passed | on C_R6: "Comparisons and predicates are leaves: nothing can be placed under them." On C_R7: "An AND/OR condition needs at least two operands." |
-| Give C_R6 (a temperature) the kW threshold | allowed | passed | "The threshold's unit must measure the same quantity as the output." |
-
-Two things show up here. First, the reasoner passed every trip. The vocabulary says a comparison
-has exactly one threshold, but OWL reads a missing value as "not stated yet", not as a
-contradiction. SHACL checks the model as written, so the method needs both: the vocabulary says
-what a comparison is, the shapes say what a user must enter. Second, the editor enforces only
-part of the shapes while you type (required fields, pick lists). Rules that relate several
-instances, such as the unit check or the leaf rule, are only caught by validate.
-
-### What dogfooding changed in the method
-
-- **Condition tree forms.** Adding an AND condition first showed Quantifier and Over instead of
-  Connective. The editor builds each kind's form from the last shape that targets that kind, and
-  the last one was a rule shape. The tree now has one shape per kind that holds that kind's
-  fields and rules.
-- **Required descriptions.** The three leaves were first created without descriptions, because
-  the Comparisons table did not require one (only the tree did). Every user-facing editor now
-  requires a description.
-- **Live checks and classification.** The Traceability table first showed no safety
-  requirements at all. The live view runs a lighter reasoner that skips definitions like
-  SafetyRequirement's, so that column now applies the definition directly.
+R6, R7 and the stakeholders, strategies, thresholds and conditions behind them were entered
+through the editors above. R6 was entered as a plain requirement; the Traceability table shows
+it as a safety requirement because a Regulator raised it. What the pass changed in the method is
+recorded in [METHOD.md](../../../../METHOD.md).

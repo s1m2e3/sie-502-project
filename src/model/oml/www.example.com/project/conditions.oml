@@ -157,7 +157,7 @@ description <http://www.example.com/project/conditions#> as conditions {
         expression:comparisonOperator "LE"
         expression:hasThreshold T_MaxCapturedPower
         expression:hasInput system:SolarIrradiance, system:OperationMode
-        expression:isSubconditionOf C_R6
+        expression:isSubconditionOf C_R7
     ]
 
     instance C_R7 : expression:CompoundCondition [
