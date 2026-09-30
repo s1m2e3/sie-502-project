@@ -11,9 +11,9 @@ description <http://www.example.com/project/requirements#> as requirements {
     instance R1 : requirement:Requirement [
         base:description "Delivery of hot nitrogen"
         base:expression "During operation, at the design solar irradiance of 800 W/m2 or more, the system shall deliver nitrogen to the pyrolysis reactor at 673.15 K or more and at 1.8 kg/h or more."
-        requirement:isRaisedBy stakeholders:ReactorManagers
         requirement:hasCondition conditions:C_R1
         requirement:isVerifiedBy verification:TS_ThermalSimulation
+        requirement:isRaisedBy stakeholders:ReactorManagers, stakeholders:ProductBuyers
     ]
 
     instance R2 : requirement:Requirement [
@@ -47,5 +47,21 @@ description <http://www.example.com/project/requirements#> as requirements {
         requirement:isRaisedBy stakeholders:PlantManagers
         requirement:hasCondition conditions:C_R5
         requirement:isVerifiedBy verification:TS_ThermalSimulation
+    ]
+
+    instance R6 : requirement:Requirement [
+        base:description "Insulated surface safety"
+        base:expression "During operation the insulated pipe surface shall stay at or below 333.15 K."
+        requirement:isRaisedBy stakeholders:MaintenanceOperators, stakeholders:SafetyRegulators, stakeholders:LocalMedia, stakeholders:PlantManagers
+        requirement:hasCondition conditions:C_R6
+        requirement:isVerifiedBy verification:TS_InsulationInspection
+    ]
+
+    instance R7 : requirement:Requirement [
+        base:description "Captured power range"
+        base:expression "During operation, at the design solar irradiance of 800 W/m2 or more, the lens shall concentrate between 2.0 kW and 3.0 kW onto the pipe."
+        requirement:isRaisedBy stakeholders:LensSupplier, stakeholders:PlantManagers
+        requirement:hasCondition conditions:C_R7
+        requirement:isVerifiedBy verification:TS_LensPowerTest
     ]
 }

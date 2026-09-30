@@ -45,14 +45,14 @@ vocabulary <http://www.example.com/method/expression#> as expression {
     @dc:description "A numeric bound on an output: exactly one operator against exactly one threshold. A range is two comparisons (lower and upper bound) joined by AND."
     concept Comparison < AtomicCondition [ restricts hasThreshold to exactly 1 ]
 
-    concept CompoundCondition < Condition [        // AND/OR over >= 2 whole conditions
-        restricts hasOperand to min 2
+    concept CompoundCondition < Condition [        // AND/OR over >= 2 whole conditions (its operands)
+        restricts hasSubcondition to min 2
         restricts connective to exactly 1
     ]
-    concept QuantifiedCondition < Condition [      // ForAll/Exists X in a set: body holds
-        restricts quantifier     to exactly 1
-        restricts quantifiesOver to exactly 1
-        restricts hasBody        to exactly 1
+    concept QuantifiedCondition < Condition [      // ForAll/Exists X in a set: its one subcondition (the body) holds
+        restricts quantifier      to exactly 1
+        restricts quantifiesOver  to exactly 1
+        restricts hasSubcondition to exactly 1
     ]
 
     // --- properties ---
@@ -109,16 +109,15 @@ vocabulary <http://www.example.com/method/expression#> as expression {
         reverse exhibits
         functional ]
     relation hasInput   [ from AtomicCondition to Input reverse isInputTo ]   // context lives on the leaves, not on compounds/quantifiers
-    relation hasOperand [
-        from CompoundCondition to Condition
-        reverse isOperandOf asymmetric irreflexive ]
+    @dc:description "Links a condition to the conditions it is built from. The role follows from the parent: under AND/OR a subcondition is an operand, under ForAll/Exists it is the body."
+    relation hasSubcondition [                     // one relation, not operand + body: the tree editor nests by a single parent link
+        from Condition to Condition
+        reverse isSubconditionOf
+        inverse functional asymmetric irreflexive ]
     relation quantifiesOver [                      // exactly one set; mixed kinds = user defines a set Output (e.g. munitions)
         from QuantifiedCondition to Output
         reverse isQuantifiedBy
         functional ]
-    relation hasBody [
-        from QuantifiedCondition to Condition
-        reverse isBodyOf functional asymmetric irreflexive ]
     relation hasMember [                           // set membership between outputs: munitions hasMember missiles, bombs
         from Output to Output
         reverse isMemberOf

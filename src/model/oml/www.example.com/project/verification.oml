@@ -19,4 +19,14 @@ description <http://www.example.com/project/verification#> as verification {
         base:description "Simulated maintenance run showing accessible surfaces below the touch limit"
         requirement:hasVerificationMethod "Demonstration"
     ]
+
+    instance TS_InsulationInspection : requirement:TestingStrategy [
+        requirement:hasVerificationMethod "Inspection"
+        base:description "Inspection of the insulation on the heated pipe section against the surface temperature limit"
+    ]
+
+    instance TS_LensPowerTest : requirement:TestingStrategy [
+        requirement:hasVerificationMethod "Test"
+        base:description "Measurement of the power the lens captures over the sunlight range"
+    ]
 }

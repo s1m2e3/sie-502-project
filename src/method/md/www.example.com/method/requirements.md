@@ -34,7 +34,9 @@ requirement:RequirementShape
         sh:path base:description ;
         sh:name "Description" ;
         dash:editor dash:TextAreaEditor ;
+        sh:minCount 1 ;
         sh:maxCount 1 ;
+        sh:message "A requirement must have a short description (its title)." ;
     ] ;
     sh:property [
         sh:path base:expression ;

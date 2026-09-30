@@ -7,10 +7,6 @@ description <http://www.example.com/project/conditions#> as conditions {
     extends <http://www.example.com/project/quantities#> as quantities
     extends <http://www.example.com/project/system#> as system
 
-    //
-    // Thresholds: one value and one unit each; comparisons point to them
-    //
-
     instance T_MinOutletTemperature : expression:Threshold [
         base:description "Minimum outlet nitrogen temperature (400 C)"
         expression:thresholdValue 673.15
@@ -47,7 +43,6 @@ description <http://www.example.com/project/conditions#> as conditions {
         expression:hasUnit quantities:kW
     ]
 
-    // R1: AND of two leaves
     instance C_R1 : expression:CompoundCondition [
         base:description "During operation, at the design solar irradiance of 800 W/m2 or more: both the outlet temperature and the outlet flow conditions hold (AND)"
         expression:connective "AND"
@@ -55,7 +50,7 @@ description <http://www.example.com/project/conditions#> as conditions {
 
     instance C_R1_Temperature : expression:Comparison [
         base:description "During operation, at the design solar irradiance of 800 W/m2 or more, the outlet nitrogen temperature is at least 673.15 K (400 C)"
-        expression:isOperandOf C_R1
+        expression:isSubconditionOf C_R1
         expression:constrains system:OutletNitrogenTemperature
         expression:hasInput system:OperationMode
         expression:hasInput system:SolarIrradiance
@@ -65,14 +60,13 @@ description <http://www.example.com/project/conditions#> as conditions {
 
     instance C_R1_Flow : expression:Comparison [
         base:description "During operation, the outlet nitrogen mass flow is at least 1.8 kg/h"
-        expression:isOperandOf C_R1
+        expression:isSubconditionOf C_R1
         expression:constrains system:OutletNitrogenMassFlow
         expression:hasInput system:OperationMode
         expression:comparisonOperator "GE"
         expression:hasThreshold T_MinOutletMassFlow
     ]
 
-    // R2: AND of two leaves
     instance C_R2 : expression:CompoundCondition [
         base:description "During operation: neither the delivered gas nor the pipe exceeds its thermal limit (AND)"
         expression:connective "AND"
@@ -80,7 +74,7 @@ description <http://www.example.com/project/conditions#> as conditions {
 
     instance C_R2_OutletLimit : expression:Comparison [
         base:description "During operation, the outlet nitrogen temperature is at most 873.15 K (600 C)"
-        expression:isOperandOf C_R2
+        expression:isSubconditionOf C_R2
         expression:constrains system:OutletNitrogenTemperature
         expression:hasInput system:OperationMode
         expression:comparisonOperator "LE"
@@ -89,14 +83,13 @@ description <http://www.example.com/project/conditions#> as conditions {
 
     instance C_R2_WallLimit : expression:Comparison [
         base:description "During operation, the bare pipe surface temperature is at most 923.15 K (650 C)"
-        expression:isOperandOf C_R2
+        expression:isSubconditionOf C_R2
         expression:constrains system:BarePipeSurfaceTemperature
         expression:hasInput system:OperationMode
         expression:comparisonOperator "LE"
         expression:hasThreshold T_MaxWallTemperature
     ]
 
-    // R3: a single categorical leaf
     instance C_R3 : expression:Predicate [
         base:description "During operation, the composition of the delivered gas is nitrogen"
         expression:constrains system:OutletGasComposition
@@ -105,7 +98,6 @@ description <http://www.example.com/project/conditions#> as conditions {
         expression:targetValue "nitrogen"
     ]
 
-    // R4: for all accessible surfaces, during maintenance
     instance C_R4 : expression:QuantifiedCondition [
         base:description "During maintenance, for every accessible surface temperature in the set, the touch limit holds (ForAll)"
         expression:quantifier "ForAll"
@@ -114,14 +106,13 @@ description <http://www.example.com/project/conditions#> as conditions {
 
     instance C_R4_TouchLimit : expression:Comparison [
         base:description "During maintenance, an accessible surface temperature is at most 323.15 K (50 C)"
-        expression:isBodyOf C_R4
+        expression:isSubconditionOf C_R4
         expression:constrains system:AccessibleSurfaceTemperatures
         expression:hasInput system:MaintenanceMode
         expression:comparisonOperator "LE"
         expression:hasThreshold T_TouchLimit
     ]
 
-    // R5: a single power leaf
     instance C_R5 : expression:Comparison [
         base:description "During operation, at the design solar irradiance of 800 W/m2 or more, the captured solar power is at least 2.0 kW"
         expression:constrains system:CapturedSolarPower
@@ -129,5 +120,48 @@ description <http://www.example.com/project/conditions#> as conditions {
         expression:hasInput system:SolarIrradiance
         expression:comparisonOperator "GE"
         expression:hasThreshold T_MinCapturedPower
+    ]
+
+    instance T_MaxInsulatedSurface : expression:Threshold [
+        expression:hasUnit quantities:K
+        expression:thresholdValue 333.15
+        base:description "Maximum insulated pipe surface temperature (60 C)"
+    ]
+
+    instance T_MaxCapturedPower : expression:Threshold [
+        expression:hasUnit quantities:kW
+        expression:thresholdValue 3.0
+        base:description "Maximum captured solar power"
+    ]
+
+    instance C_R6 : expression:Comparison [
+        base:description "During operation, the insulated pipe surface temperature is at most 333.15 K (60 C)"
+        expression:constrains system:InsulatedPipeSurfaceTemperature
+        expression:comparisonOperator "LE"
+        expression:hasThreshold T_MaxInsulatedSurface
+        expression:hasInput system:OperationMode
+    ]
+
+    instance C_R7_Lower : expression:Comparison [
+        base:description "During operation, at the design solar irradiance of 800 W/m2 or more, the captured solar power is at least 2.0 kW"
+        expression:constrains system:CapturedSolarPower
+        expression:comparisonOperator "GE"
+        expression:hasThreshold T_MinCapturedPower
+        expression:hasInput system:OperationMode, system:SolarIrradiance
+        expression:isSubconditionOf C_R7
+    ]
+
+    instance C_R7_Upper : expression:Comparison [
+        base:description "During operation, at the design solar irradiance of 800 W/m2 or more, the captured solar power is at most 3.0 kW"
+        expression:constrains system:CapturedSolarPower
+        expression:comparisonOperator "LE"
+        expression:hasThreshold T_MaxCapturedPower
+        expression:hasInput system:SolarIrradiance, system:OperationMode
+        expression:isSubconditionOf C_R6
+    ]
+
+    instance C_R7 : expression:CompoundCondition [
+        expression:connective "AND"
+        base:description "During operation, at the design solar irradiance of 800 W/m2 or more: the captured solar power stays between 2.0 kW and 3.0 kW (AND)"
     ]
 }

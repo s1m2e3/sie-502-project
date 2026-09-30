@@ -64,7 +64,9 @@ expression:ThresholdShape
         sh:path base:description ;
         sh:name "Description" ;
         dash:editor dash:TextAreaEditor ;
+        sh:minCount 1 ;
         sh:maxCount 1 ;
+        sh:message "A threshold must have a description stating what it bounds." ;
         sh:order 4 ;
     ] ;
     .
@@ -72,9 +74,11 @@ expression:ThresholdShape
 
 ## Condition tree
 
-The structure of each condition. AND/OR conditions hold two or more operands; ForAll/Exists
-conditions hold exactly one body. Add a child under its parent; the leaves (comparisons and
-predicates) are detailed in the tables below.
+The structure of each condition. Every child points to its parent through one link,
+"Subcondition of". Its role follows from the parent: under an AND/OR condition it is an operand
+(two or more), under a ForAll/Exists condition it is the body (exactly one). Comparisons and
+predicates are leaves and never have children. Add a child under its parent; the leaves are
+detailed in the tables below.
 
 ```tree-editor
 ---
@@ -97,37 +101,76 @@ expression:ConditionTreeShape
         sh:name "Kind" ;
         sh:order 1 ;
     ] ;
+    .
+
+expression:CompoundConditionShape
+    a sh:NodeShape ;
+    sh:targetClass expression:CompoundCondition ;
     sh:property [
-        sh:path expression:isOperandOf ;
-        sh:name "Operand of" ;
-        sh:class expression:CompoundCondition ;
+        sh:path expression:isSubconditionOf ;
+        sh:name "Subcondition of" ;
         sh:maxCount 1 ;
-        dash:composite true ;
-    ] ;
-    sh:property [
-        sh:path expression:isBodyOf ;
-        sh:name "Body of" ;
-        sh:class expression:QuantifiedCondition ;
-        sh:maxCount 1 ;
+        sh:message "A condition has at most one parent." ;
         dash:composite true ;
     ] ;
     sh:property [
         sh:path expression:connective ;
         sh:name "Connective" ;
+        sh:minCount 1 ;
         sh:maxCount 1 ;
+        sh:message "An AND/OR condition needs exactly one connective." ;
         sh:order 2 ;
+    ] ;
+    sh:property [
+        sh:path base:description ;
+        sh:name "Description" ;
+        dash:editor dash:TextAreaEditor ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "A condition must have a description stating it in words." ;
+        sh:order 5 ;
+    ] ;
+    sh:property [
+        sh:path [ sh:inversePath expression:isSubconditionOf ] ;
+        sh:minCount 2 ;
+        sh:message "An AND/OR condition needs at least two operands." ;
+    ] ;
+    sh:sparql [
+        sh:message "Only a ForAll/Exists condition has a quantifier or ranges over a set; leave Quantifier and Over empty here." ;
+        sh:select """
+            PREFIX expression: <http://www.example.com/method/expression#>
+            SELECT $this WHERE {
+                { $this expression:quantifier ?q . } UNION { $this expression:quantifiesOver ?o . }
+            }
+        """ ;
+    ] ;
+    .
+
+expression:QuantifiedConditionShape
+    a sh:NodeShape ;
+    sh:targetClass expression:QuantifiedCondition ;
+    sh:property [
+        sh:path expression:isSubconditionOf ;
+        sh:name "Subcondition of" ;
+        sh:maxCount 1 ;
+        sh:message "A condition has at most one parent." ;
+        dash:composite true ;
     ] ;
     sh:property [
         sh:path expression:quantifier ;
         sh:name "Quantifier" ;
+        sh:minCount 1 ;
         sh:maxCount 1 ;
+        sh:message "A ForAll/Exists condition needs exactly one quantifier." ;
         sh:order 3 ;
     ] ;
     sh:property [
         sh:path expression:quantifiesOver ;
         sh:name "Over" ;
         sh:class expression:Output ;
+        sh:minCount 1 ;
         sh:maxCount 1 ;
+        sh:message "A ForAll/Exists condition ranges over exactly one set (an output)." ;
         sh:order 4 ;
     ] ;
     sh:property [
@@ -139,70 +182,61 @@ expression:ConditionTreeShape
         sh:message "A condition must have a description stating it in words." ;
         sh:order 5 ;
     ] ;
-    .
-
-expression:CompoundConditionShape
-    a sh:NodeShape ;
-    sh:targetClass expression:CompoundCondition ;
     sh:property [
-        sh:path expression:connective ;
-        sh:minCount 1 ;
-        sh:message "An AND/OR condition needs its connective." ;
-    ] ;
-    sh:property [
-        sh:path [ sh:inversePath expression:isOperandOf ] ;
-        sh:minCount 2 ;
-        sh:message "An AND/OR condition needs at least two operands." ;
-    ] ;
-    .
-
-expression:QuantifiedConditionShape
-    a sh:NodeShape ;
-    sh:targetClass expression:QuantifiedCondition ;
-    sh:property [
-        sh:path expression:quantifier ;
-        sh:minCount 1 ;
-        sh:message "A ForAll/Exists condition needs its quantifier." ;
-    ] ;
-    sh:property [
-        sh:path expression:quantifiesOver ;
-        sh:minCount 1 ;
-        sh:message "A ForAll/Exists condition needs the set it ranges over." ;
-    ] ;
-    sh:property [
-        sh:path [ sh:inversePath expression:isBodyOf ] ;
+        sh:path [ sh:inversePath expression:isSubconditionOf ] ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
         sh:message "A ForAll/Exists condition needs exactly one body." ;
     ] ;
-    .
-
-expression:NotCompoundShape
-    a sh:NodeShape ;
-    sh:targetClass expression:QuantifiedCondition ;
-    sh:targetClass expression:Comparison ;
-    sh:targetClass expression:Predicate ;
-    sh:property [
-        sh:path expression:connective ;
-        sh:maxCount 0 ;
+    sh:sparql [
         sh:message "Only an AND/OR condition has a connective; leave Connective empty here." ;
+        sh:select """
+            PREFIX expression: <http://www.example.com/method/expression#>
+            SELECT $this WHERE { $this expression:connective ?c . }
+        """ ;
     ] ;
     .
 
-expression:NotQuantifiedShape
+expression:LeafShape
     a sh:NodeShape ;
-    sh:targetClass expression:CompoundCondition ;
     sh:targetClass expression:Comparison ;
     sh:targetClass expression:Predicate ;
     sh:property [
-        sh:path expression:quantifier ;
-        sh:maxCount 0 ;
-        sh:message "Only a ForAll/Exists condition has a quantifier; leave Quantifier empty here." ;
+        sh:path expression:isSubconditionOf ;
+        sh:name "Subcondition of" ;
+        sh:maxCount 1 ;
+        sh:message "A condition has at most one parent." ;
+        dash:composite true ;
     ] ;
     sh:property [
-        sh:path expression:quantifiesOver ;
+        sh:path base:description ;
+        sh:name "Description" ;
+        dash:editor dash:TextAreaEditor ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "A condition must have a description stating it in words." ;
+        sh:order 5 ;
+    ] ;
+    sh:property [
+        sh:path [ sh:inversePath expression:isSubconditionOf ] ;
         sh:maxCount 0 ;
-        sh:message "Only a ForAll/Exists condition ranges over a set; leave Over empty here." ;
+        sh:message "Comparisons and predicates are leaves: nothing can be placed under them. Put the children under an AND/OR or ForAll/Exists condition instead." ;
+    ] ;
+    sh:sparql [
+        sh:message "Only an AND/OR condition has a connective; leave Connective empty here." ;
+        sh:select """
+            PREFIX expression: <http://www.example.com/method/expression#>
+            SELECT $this WHERE { $this expression:connective ?c . }
+        """ ;
+    ] ;
+    sh:sparql [
+        sh:message "Only a ForAll/Exists condition has a quantifier or ranges over a set; leave Quantifier and Over empty here." ;
+        sh:select """
+            PREFIX expression: <http://www.example.com/method/expression#>
+            SELECT $this WHERE {
+                { $this expression:quantifier ?q . } UNION { $this expression:quantifiesOver ?o . }
+            }
+        """ ;
     ] ;
     .
 ```
@@ -279,7 +313,9 @@ expression:ComparisonShape
         sh:path base:description ;
         sh:name "Description" ;
         dash:editor dash:TextAreaEditor ;
+        sh:minCount 1 ;
         sh:maxCount 1 ;
+        sh:message "A comparison must have a description stating it in words." ;
         sh:order 8 ;
     ] ;
     sh:sparql [
@@ -361,7 +397,9 @@ expression:PredicateShape
         sh:path base:description ;
         sh:name "Description" ;
         dash:editor dash:TextAreaEditor ;
+        sh:minCount 1 ;
         sh:maxCount 1 ;
+        sh:message "A predicate must have a description stating it in words." ;
         sh:order 5 ;
     ] ;
     sh:sparql [
