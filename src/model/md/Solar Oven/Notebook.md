@@ -140,6 +140,17 @@ GROUP BY ?requirement ?description
 ORDER BY ?requirement
 ```
 
+### One requirement in full
+
+The table above shows every requirement in one row each. To read a single requirement down to
+its bounds, call the `requirement-trace` template with it. Here it is called with R4; the
+[Dashboard](Dashboard.md) calls the same template with R5.
+
+```compose
+template: http://www.example.com/method/requirement-trace
+requirement: http://www.example.com/project/requirements#R4
+```
+
 ### Stakeholders who raise nothing
 
 The method says a stakeholder is only modeled if it raises at least one requirement. That rule
