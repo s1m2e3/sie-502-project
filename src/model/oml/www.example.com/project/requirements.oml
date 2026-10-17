@@ -25,6 +25,7 @@ description <http://www.example.com/project/requirements#> as requirements {
     ]
 
     instance R3 : requirement:Requirement [
+        base:description "Inert gas delivered"
         base:expression "During operation the system shall deliver gas whose composition is nitrogen, so that no oxygen reaches the pyrolysis reactor."
         requirement:isRaisedBy stakeholders:ReactorManagers
         requirement:hasCondition conditions:C_R3
