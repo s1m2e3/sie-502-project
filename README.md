@@ -1,4 +1,6 @@
 # Solar Oven for Nitrogen Heating: An OML Model
+[![Release](https://img.shields.io/github/v/release/s1m2e3/sie-502-project)](https://github.com/s1m2e3/sie-502-project/releases/latest)
+[![Live Site](https://img.shields.io/badge/Live-Site-brightgreen)](https://s1m2e3.github.io/sie-502-project/)
 
 An [OML](https://www.modelware.io/) model of a **solar oven that heats nitrogen for a pyrolysis
 reactor**, built for SIE-502. It records the stakeholders, their requirements, what each
