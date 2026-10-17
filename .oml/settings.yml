@@ -5,7 +5,7 @@ oml-code:
 # project npm settings
 project:
   name: "@s1m2e3/solar-oven-method"
-  version: 0.1.0
+  version: 1.0.0
   title: Solar Oven Method
   description: A requirements-and-verification method (stakeholders, requirements, conditions, testing strategies) with a VCRM generator
 

@@ -5,7 +5,7 @@ description <http://www.example.com/project/stakeholders#> as stakeholders {
     uses <http://www.example.com/method/base#> as base
     uses <http://www.example.com/method/requirement#> as requirement
 
-    instance ReactorManagers : requirement:InternalClient, requirement:ExternalClient [
+    instance ReactorManagers : requirement:InternalClient [
         base:description "Pyrolysis reactor subsystem managers"
     ]
 
