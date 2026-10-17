@@ -1,0 +1,120 @@
+@dc:title "VCRM Generator"
+@dc:description "Generates a Verification Cross-Reference Matrix: every testing strategy, grouped by verification method, with the requirements it verifies, their conditions, the outputs they constrain, and the stakeholders who raised them."
+description <http://www.example.com/method/codegen/vcrm#> as vcrm {
+
+    uses <http://purl.org/dc/elements/1.1/> as dc
+    uses <http://opencaesar.io/codegen#> as codegen
+
+    instance VcrmSpec : codegen:Spec [
+        codegen:construct """
+            PREFIX oml:         <http://opencaesar.io/oml#>
+            PREFIX codegen:     <http://opencaesar.io/codegen#>
+            PREFIX base:        <http://www.example.com/method/base#>
+            PREFIX expression:  <http://www.example.com/method/expression#>
+            PREFIX requirement: <http://www.example.com/method/requirement#>
+            PREFIX tt:          <https://mozilla.github.io/nunjucks#>
+            PREFIX templates:   <http://www.example.com/method/codegen/vcrm#>
+
+            CONSTRUCT {
+                ?file a codegen:File ;
+                    codegen:path ?path ;
+                    codegen:template templates:VcrmTemplate ;
+                    codegen:root ?doc .
+
+                ?doc tt:strategy ?ts ;
+                     tt:requirement ?req .
+
+                ?ts tt:name ?tsName ;
+                    tt:method ?method ;
+                    tt:description ?tsDesc ;
+                    tt:verifies ?req .
+
+                ?req tt:name ?reqName ;
+                     tt:title ?reqTitle ;
+                     tt:text ?reqText ;
+                     tt:condition ?condName ;
+                     tt:output ?outName ;
+                     tt:stakeholder ?shName ;
+                     tt:strategyName ?tsName .
+            }
+            WHERE {
+                BIND(IRI("urn:vcrm:document") AS ?doc)
+                BIND(IRI("urn:file:vcrm") AS ?file)
+                BIND(CONCAT("${path}/vcrm.md") AS ?path)
+
+                # One block per testing strategy; a strategy that verifies nothing still appears
+                ?ts a requirement:TestingStrategy ;
+                    requirement:hasVerificationMethod ?method .
+                BIND(REPLACE(STR(?ts), "^.*[/#]", "") AS ?tsName)
+                OPTIONAL { ?ts base:description ?tsDesc }
+
+                OPTIONAL {
+                    ?req requirement:isVerifiedBy ?ts .
+                    BIND(REPLACE(STR(?req), "^.*[/#]", "") AS ?reqName)
+                    OPTIONAL { ?req base:description ?reqTitle }
+                    OPTIONAL { ?req base:expression ?reqText }
+
+                    # Who raised it
+                    OPTIONAL {
+                        ?req requirement:isRaisedBy ?sh .
+                        BIND(REPLACE(STR(?sh), "^.*[/#]", "") AS ?shName)
+                    }
+
+                    # Its condition, and every output constrained anywhere in the condition tree
+                    OPTIONAL {
+                        ?req requirement:hasCondition ?cond .
+                        BIND(REPLACE(STR(?cond), "^.*[/#]", "") AS ?condName)
+                        OPTIONAL {
+                            ?cond (expression:hasSubcondition|^expression:isSubconditionOf)* ?leaf .
+                            ?leaf expression:constrains ?out .
+                            BIND(REPLACE(STR(?out), "^.*[/#]", "") AS ?outName)
+                        }
+                    }
+                }
+            }
+        """
+        codegen:parameter "path"
+    ]
+
+    instance VcrmTemplate : codegen:Template [
+        codegen:body """
+            {%- set doc = object(file, "codegen:root") -%}
+            {%- set strategies = objects(doc, "tt:strategy") -%}
+            {%- set reqs = objects(doc, "tt:requirement") | sort -%}
+            # Verification Cross-Reference Matrix
+
+            ## Matrix
+
+            | Requirement | Title | Verified by | Raised by |
+            | --- | --- | --- | --- |
+            {%- for r in reqs %}
+            | {{ object(r, "tt:name") }} | {{ object(r, "tt:title") }} | {{ objects(r, "tt:strategyName") | sort | join(", ") }} | {{ objects(r, "tt:stakeholder") | sort | join(", ") }} |
+            {%- endfor %}
+
+            {%- for m in ["Analysis", "Inspection", "Test", "Demonstration"] %}
+            {%- set group = [] %}
+            {%- for s in strategies %}{% if object(s, "tt:method") == m %}{% if group.push(s) %}{% endif %}{% endif %}{% endfor %}
+            {%- if group | length %}
+
+            ## {{ m }}
+            {%- for s in group | sort %}
+
+            ### {{ object(s, "tt:name") }}
+
+            {{ object(s, "tt:description") }}
+            {% set verified = objects(s, "tt:verifies") | sort %}
+            {%- if verified | length == 0 %}
+            *(verifies no requirement)*
+            {%- endif %}
+            {%- for r in verified %}
+            - **{{ object(r, "tt:name") }}: {{ object(r, "tt:title") }}**
+              - Statement: {{ object(r, "tt:text") }}
+              - Condition: {{ object(r, "tt:condition") or "*(none)*" }}; constrains {{ objects(r, "tt:output") | sort | join(", ") or "*(no output)*" }}
+              - Raised by: {{ objects(r, "tt:stakeholder") | sort | join(", ") }}
+            {%- endfor %}
+            {%- endfor %}
+            {%- endif %}
+            {%- endfor %}
+        """
+    ]
+}

@@ -4,10 +4,10 @@ oml-code:
 
 # project npm settings
 project:
-  name: "@oml/project"
+  name: "@s1m2e3/solar-oven-method"
   version: 0.1.0
-  title: Project
-  description: The Project ontologies.
+  title: Solar Oven Method
+  description: A requirements-and-verification method (stakeholders, requirements, conditions, testing strategies) with a VCRM generator
 
 # source folders
 sources:
@@ -20,8 +20,14 @@ sources:
 # server:
 #   port: 8080
 
+# packing settings
+pack:
+  - include: [src/method]
+
 # Default CLI arguments per command, injected before your own (so you can override them on the
 # command line). Works for any oml command; key by command name. For example:
 # defaults:
 #   export: -o build/owl
 #   reason: -o build/owl -t
+defaults:
+  pack: -o build/dist

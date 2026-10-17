@@ -1,0 +1,15 @@
+@dc:title "Codegen Configs"
+@dc:description "Runs the method's generators on the solar oven model."
+description <http://www.example.com/project/codegen/configs#> as configs {
+
+    uses <http://purl.org/dc/elements/1.1/> as dc
+    uses <http://opencaesar.io/codegen#> as codegen
+
+    extends <http://www.example.com/method/codegen/vcrm#> as vcrm
+
+    instance vcrm : codegen:Config [
+        codegen:spec vcrm:VcrmSpec
+        codegen:context "http://www.example.com/project/bundle"
+        codegen:binding [codegen:key "path" codegen:value "build/docs"]
+    ]
+}
