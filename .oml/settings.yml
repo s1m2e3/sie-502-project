@@ -30,4 +30,5 @@ pack:
 #   export: -o build/owl
 #   reason: -o build/owl -t
 defaults:
+  render: -m src/model/md -b build/web -c src/model/oml/www.example.com/project/bundle.oml
   pack: -o build/dist
